@@ -11,7 +11,11 @@ public class LimbAnimator : MonoBehaviour
     public Transform target;
     public Vector3 dest=Vector3.zero;
     public bool locked=false;
-    protected float length,height,maxDistance;
+    public float length=0,height,maxDistance; //protected
+    int pt=0;
+    float[] tempMaxDist=new float[4];
+    public bool reset=false; //protected
+    protected bool main=false;
     protected void Start()
     {
         limb=GetComponent<Limb>();
@@ -20,32 +24,38 @@ public class LimbAnimator : MonoBehaviour
         {
             length+=limb.bones[i].length;
         }
-        height=Vector3.Distance(transform.position, effector.position);
-        maxDistance=length*Mathf.Cos(Mathf.Asin(height/length));
+        float distance=Vector3.Distance(transform.position, effector.position);
+        height=transform.position.y-effector.position.y;
+        tempMaxDist[0]=length*Mathf.Cos(Mathf.Asin(height/length)) - distance*Mathf.Cos(Mathf.Asin(height/distance)); 
+        tempMaxDist[1]=length*Mathf.Cos(Mathf.Asin(distance/length));
+        tempMaxDist[2]=length*Mathf.Cos(Mathf.Asin(height/distance));
+        tempMaxDist[3]=distance*Mathf.Cos(Mathf.Asin(height/length));//-
+        maxDistance=tempMaxDist[1];
+        main=!limb2.main;
         //target.position+=Vector3.forward*maxDistance/2;
-        if(!locked)
-        {
-            //dest=effector.position+Vector3.forward*maxDistance/2;
-        }
     }
 
     // Update is called once per frame
-    protected void Update()
+    protected void FixedUpdate()
     {
-        if(Vector3.Distance(effector.position,target.position)>maxDistance && Vector3.Distance(limb2.effector.position,limb2.target.position)>maxDistance/2)
-        {
+        if(Input.GetKeyDown(KeyCode.Z)){
+            maxDistance=tempMaxDist[(++pt)%2];
+        }
+        if(((limb2.locked && Vector3.Distance(effector.position,target.position)>=maxDistance*2 &&   //!locked &&
+             Vector3.Distance(limb2.effector.position,limb2.target.position)>=maxDistance)) || reset){
+            locked=false;
             dest=target.position;
         }
-        if(!locked)
-            moveLimb();
+        moveLimb();
+        if(!locked || reset){} 
+            
     }
 
     void moveLimb()
     {
-        effector.position=Vector3.MoveTowards(effector.position,dest,Time.deltaTime*20);
-        if(limb2.locked && Vector3.Distance(effector.position,dest)<0.2f){
+        effector.position=Vector3.MoveTowards(effector.position,dest,Time.fixedDeltaTime*20);
+        if(effector.position==dest && !reset){ //(limb2.locked) && 
             locked=true;
-            limb2.locked=false;
         }
     }
 }

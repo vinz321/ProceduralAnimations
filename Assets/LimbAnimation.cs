@@ -25,7 +25,7 @@ public class LimbAnimation : MonoBehaviour
             length+=limb.bones[i].length;
         }
         height=Vector3.Distance(transform.position, effector.position);
-        maxDistance=length*Mathf.Cos(Mathf.Asin(height/length));
+        maxDistance=length*1.2f*Mathf.Cos(Mathf.Asin(height/length));
     }
 
     // Update is called once per frame

@@ -10,14 +10,16 @@ public class Limb : MonoBehaviour
     public Transform effector;
     Transform[] joints;
     float maxDistance;
+    GameObject go;
     void Start()
     {
+        go=new GameObject();
         transform.up=-(effector.position-transform.position).normalized;
         transform.forward=Vector3.Cross(transform.up,-transform.parent.right);
         joints=new Transform[bones.GetUpperBound(0)+1];
         for(int i=0;i<=bones.GetUpperBound(0);i++)
         {
-            joints[i]=Instantiate(new GameObject(),bones[i].head,Quaternion.identity,transform).transform;
+            joints[i]=Instantiate(go,bones[i].head,Quaternion.identity,transform).transform;
         }
         //joints[bones.GetUpperBound(0)]=Instantiate(new GameObject(),effector.position,Quaternion.identity,transform).transform;
         maxDistance=Vector3.Distance(transform.position,effector.position);
@@ -26,7 +28,9 @@ public class Limb : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.localScale=new Vector3(1,Vector3.Distance(transform.position, effector.position)/maxDistance,1);
+        //transform.localScale=new Vector3(1,Vector3.Distance(transform.position, effector.position)/maxDistance,1);
+        //transform.localScale=new Vector3(1,Vector3.Distance(transform.position, effector.position)/maxDistance,1);
+        transform.localScale=Vector3.one-(effector.position-transform.position).normalized*(1-Vector3.Distance(transform.position, effector.position)/maxDistance);
         transform.up=-(effector.position-transform.position).normalized;
         transform.forward=Vector3.Cross(transform.up,-transform.parent.right);
         moveLimb();

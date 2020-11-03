@@ -12,12 +12,22 @@ public class CreatureController : MonoBehaviour
     {
         cc=GetComponent<CharacterController>();
     }
+    public void switchTesting(){
+        if(testPhase){
+            testPhase=false;
+            cc.enabled=false;
+            transform.position=Vector3.zero;
+            transform.rotation=Quaternion.identity;
+            //cc.enabled=true;
+        }
+        else{
+            testPhase=true;
+            cc.enabled=true;
+        }
+    }
     void Update()
     {
-        if(Input.GetMouseButtonDown(2))
-        {
-            testPhase=!testPhase;
-        }
+        
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -27,7 +37,7 @@ public class CreatureController : MonoBehaviour
                 speed=transform.forward*Input.GetAxis("Vertical");  
                 speed+=transform.right*Input.GetAxis("Strife");
             
-            cc.Move(speed*5.0f*Time.fixedDeltaTime);
+            cc.Move(speed*5.0f*Time.fixedDeltaTime + new Vector3(0,-8.0f*Time.fixedDeltaTime,0));
         } //+new Vector3(0,Mathf.Cos(Time.time)*0.02f*Time.fixedDeltaTime,0)
     }
 }
