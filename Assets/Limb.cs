@@ -14,14 +14,20 @@ public class Limb : MonoBehaviour
     void Start()
     {
         go=new GameObject();
+        init();
+        //joints[bones.GetUpperBound(0)]=Instantiate(new GameObject(),effector.position,Quaternion.identity,transform).transform;
+        
+    }
+
+    public void init(){
         transform.up=-(effector.position-transform.position).normalized;
         transform.forward=Vector3.Cross(transform.up,-transform.parent.right);
         joints=new Transform[bones.GetUpperBound(0)+1];
         for(int i=0;i<=bones.GetUpperBound(0);i++)
         {
-            joints[i]=Instantiate(go,bones[i].head,Quaternion.identity,transform).transform;
+            bones[i].limb=gameObject.GetComponent<Limb>();
+            joints[i]=Instantiate(go,bones[i].constraint,Quaternion.identity,transform).transform;
         }
-        //joints[bones.GetUpperBound(0)]=Instantiate(new GameObject(),effector.position,Quaternion.identity,transform).transform;
         maxDistance=Vector3.Distance(transform.position,effector.position);
     }
 

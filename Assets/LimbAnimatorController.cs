@@ -15,19 +15,24 @@ public class LimbAnimatorController : LimbAnimator
     {
         
         base.FixedUpdate();
-        Vector3 origin=localTargetPosition+transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance)+new Vector3(0,1.2f,0);// /2
+        Vector3 origin=localTargetPosition+transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance)+new Vector3(0,transform.position.y-effector.position.y,0);// /2
         RaycastHit hit;
-        Physics.Raycast(transform.parent.TransformPoint(origin),Vector3.down,out hit,2.4f);
-        target.localPosition=localTargetPosition+transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance);
+        Physics.Raycast(transform.parent.TransformPoint(origin),Vector3.down,out hit,(transform.position.y-effector.position.y)*2,1);
+        target.position=hit.point;
         if(cc.speed.sqrMagnitude<0.01f){
+            
+            if(!reset){
+                target.localPosition=localTargetPosition;
+                dest=target.position;
+            }
             reset=true;
-            target.localPosition=localTargetPosition;
         }
         else{
             
             if(reset && main){
-                //target.position=hit.point;
+                target.position=hit.point;
                 dest=target.position;
+                locked=false;
                 print("started");
             }
 

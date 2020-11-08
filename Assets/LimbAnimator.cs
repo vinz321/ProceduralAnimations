@@ -7,7 +7,7 @@ public class LimbAnimator : MonoBehaviour
     // Start is called before the first frame update
     Limb limb;
     public LimbAnimator limb2;
-    Transform effector;
+    public Transform effector;
     public Transform target;
     public Vector3 dest=Vector3.zero;
     public bool locked=false;
@@ -15,7 +15,7 @@ public class LimbAnimator : MonoBehaviour
     int pt=0;
     float[] tempMaxDist=new float[4];
     public bool reset=false; //protected
-    protected bool main=false;
+    public bool main=false;
     protected void Start()
     {
         limb=GetComponent<Limb>();
@@ -31,6 +31,9 @@ public class LimbAnimator : MonoBehaviour
         tempMaxDist[2]=length*Mathf.Cos(Mathf.Asin(height/distance));
         tempMaxDist[3]=distance*Mathf.Cos(Mathf.Asin(height/length));//-
         maxDistance=tempMaxDist[1];
+        if(float.IsNaN(maxDistance) || maxDistance<=0.001f){
+            maxDistance=0.3f;
+        }
         main=!limb2.main;
         //target.position+=Vector3.forward*maxDistance/2;
     }
@@ -41,14 +44,12 @@ public class LimbAnimator : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Z)){
             maxDistance=tempMaxDist[(++pt)%2];
         }
-        if(((limb2.locked && Vector3.Distance(effector.position,target.position)>=maxDistance*2 &&   //!locked &&
-             Vector3.Distance(limb2.effector.position,limb2.target.position)>=maxDistance)) || reset){
+        if(((limb2.locked && Vector3.Distance(effector.position,target.position)>=maxDistance*2 &&   //!locked && || reset
+             Vector3.Distance(limb2.effector.position,limb2.target.position)>=maxDistance)) ){
             locked=false;
             dest=target.position;
         }
         moveLimb();
-        if(!locked || reset){} 
-            
     }
 
     void moveLimb()

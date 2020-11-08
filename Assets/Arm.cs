@@ -17,6 +17,7 @@ public class Arm : MonoBehaviour
     public LimbAnimator animator;
     float length;
     bool thrown=false;
+    bool main=false;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +29,9 @@ public class Arm : MonoBehaviour
             length+=limb.bones[i].length;
         }
         float distance=Vector3.Distance(transform.position,effector.position);
-        maxDistance=length*Mathf.Cos(Mathf.Asin(distance/length));
-        //maxDistance=animator.maxDistance;
+        //maxDistance=length*Mathf.Cos(Mathf.Asin(distance/length));
+        maxDistance=animator.maxDistance;
+        main=animator.main;
     }
 
     // Update is called once per frame
@@ -42,12 +44,12 @@ public class Arm : MonoBehaviour
             else
                 effector.localPosition=center-transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance)*timePeriodicFunc(time);
         }*/
-        if(!animator.locked){
+        float d=Vector3.Distance(effector.localPosition,center);
+        if(!animator.locked && !(animator.reset && main)){
             thrown=true;
         }
 
         if(thrown){
-            float d=Vector3.Distance(effector.localPosition,center);
             effector.localPosition=Vector3.MoveTowards(effector.localPosition,center+transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance),20.0f*Time.fixedDeltaTime*distanceFunc(d));
         }
         
@@ -57,8 +59,7 @@ public class Arm : MonoBehaviour
         
         
         if(!thrown){
-                effector.localPosition=Vector3.MoveTowards(effector.localPosition,center-transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance),6.0f*Time.fixedDeltaTime);
-            
+            effector.localPosition=Vector3.MoveTowards(effector.localPosition,center-transform.parent.InverseTransformDirection(cc.speed.normalized*maxDistance),12.0f*Time.fixedDeltaTime*distanceFunc(d));   
         }
 
         //effector.localPosition=center-new Vector3(0,0,1)*cc.speed.sqrMagnitude*maxDistance*timePeriodicFunc(time);
@@ -90,3 +91,4 @@ public class Arm : MonoBehaviour
         
     }
 }
+
